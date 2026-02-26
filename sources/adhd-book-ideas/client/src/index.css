@@ -1,0 +1,309 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* 
+ * ADHD 书籍创意生成器 — 全局设计系统
+ * 风格：编辑设计 × 斯堪的纳维亚极简主义
+ * 主色调：温暖奶油白 + 深墨色 + 珊瑚红 + 靛蓝
+ * 字体：Playfair Display (标题) + DM Sans (正文) + DM Mono (数字)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* 自定义设计令牌 */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+  
+  /* 品牌色 */
+  --coral: oklch(0.65 0.18 25);
+  --indigo: oklch(0.45 0.15 265);
+  --amber: oklch(0.72 0.14 65);
+  --sage: oklch(0.62 0.08 150);
+  --plum: oklch(0.42 0.12 310);
+}
+
+:root {
+  --radius: 0.5rem;
+  
+  /* 主色：温暖奶油白背景 + 深墨色文字 */
+  --background: oklch(0.98 0.01 85);
+  --foreground: oklch(0.12 0.02 260);
+  
+  /* 卡片：略带纸质感的白色 */
+  --card: oklch(1 0.005 85);
+  --card-foreground: oklch(0.12 0.02 260);
+  
+  --popover: oklch(1 0.005 85);
+  --popover-foreground: oklch(0.12 0.02 260);
+  
+  /* 主色调：珊瑚红 */
+  --primary: oklch(0.65 0.18 25);
+  --primary-foreground: oklch(0.98 0.01 85);
+  
+  /* 次要色：浅灰米色 */
+  --secondary: oklch(0.94 0.01 85);
+  --secondary-foreground: oklch(0.25 0.02 260);
+  
+  --muted: oklch(0.94 0.01 85);
+  --muted-foreground: oklch(0.52 0.02 260);
+  
+  /* 强调色：靛蓝 */
+  --accent: oklch(0.45 0.15 265);
+  --accent-foreground: oklch(0.98 0.01 85);
+  
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  
+  --border: oklch(0.88 0.01 85);
+  --input: oklch(0.88 0.01 85);
+  --ring: oklch(0.65 0.18 25);
+  
+  /* 图表颜色 */
+  --chart-1: oklch(0.65 0.18 25);   /* 珊瑚红 */
+  --chart-2: oklch(0.45 0.15 265);  /* 靛蓝 */
+  --chart-3: oklch(0.72 0.14 65);   /* 琥珀 */
+  --chart-4: oklch(0.62 0.08 150);  /* 鼠尾草绿 */
+  --chart-5: oklch(0.42 0.12 310);  /* 梅紫 */
+  
+  --sidebar: oklch(0.96 0.01 85);
+  --sidebar-foreground: oklch(0.12 0.02 260);
+  --sidebar-primary: oklch(0.65 0.18 25);
+  --sidebar-primary-foreground: oklch(0.98 0.01 85);
+  --sidebar-accent: oklch(0.94 0.01 85);
+  --sidebar-accent-foreground: oklch(0.12 0.02 260);
+  --sidebar-border: oklch(0.88 0.01 85);
+  --sidebar-ring: oklch(0.65 0.18 25);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1280px;
+    }
+  }
+  
+  /* 编辑设计风格的字体工具类 */
+  .font-display {
+    font-family: var(--font-display);
+  }
+  
+  .font-body {
+    font-family: var(--font-body);
+  }
+  
+  .font-mono-custom {
+    font-family: var(--font-mono);
+  }
+  
+  /* 纸质纹理背景 */
+  .paper-texture {
+    background-image: 
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+  
+  /* 书籍概念卡片 */
+  .book-card {
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .book-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px -10px oklch(0.12 0.02 260 / 0.15);
+  }
+  
+  /* 大号序号装饰 */
+  .ordinal-bg {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 8rem;
+    line-height: 1;
+    color: oklch(0.12 0.02 260 / 0.04);
+    user-select: none;
+    pointer-events: none;
+  }
+  
+  /* 分隔线样式 */
+  .divider-thick {
+    height: 4px;
+    background: oklch(0.65 0.18 25);
+  }
+  
+  .divider-thin {
+    height: 1px;
+    background: oklch(0.88 0.01 85);
+  }
+  
+  /* 标签样式 */
+  .tag-coral {
+    background: oklch(0.65 0.18 25 / 0.1);
+    color: oklch(0.55 0.18 25);
+    border: 1px solid oklch(0.65 0.18 25 / 0.3);
+  }
+  
+  .tag-indigo {
+    background: oklch(0.45 0.15 265 / 0.1);
+    color: oklch(0.45 0.15 265);
+    border: 1px solid oklch(0.45 0.15 265 / 0.3);
+  }
+  
+  .tag-amber {
+    background: oklch(0.72 0.14 65 / 0.1);
+    color: oklch(0.55 0.14 65);
+    border: 1px solid oklch(0.72 0.14 65 / 0.3);
+  }
+  
+  .tag-sage {
+    background: oklch(0.62 0.08 150 / 0.1);
+    color: oklch(0.45 0.08 150);
+    border: 1px solid oklch(0.62 0.08 150 / 0.3);
+  }
+  
+  .tag-plum {
+    background: oklch(0.42 0.12 310 / 0.1);
+    color: oklch(0.42 0.12 310);
+    border: 1px solid oklch(0.42 0.12 310 / 0.3);
+  }
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: oklch(0.94 0.01 85);
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.75 0.05 85);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.65 0.18 25);
+}
+
+/* 入场动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+.animate-count-up {
+  animation: countUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 延迟类 */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
