@@ -691,7 +691,7 @@ export default function Home() {
               </span>
             </div>
             <p className="text-xs text-muted-foreground font-body text-center">
-              本报告由 Manus AI 资深出版策略师模式生成 · 数据来源：CDC、CHADD、Grand View Research · 2026
+              数据来源：CDC、CHADD、Grand View Research · 2026
             </p>
           </div>
         </div>
