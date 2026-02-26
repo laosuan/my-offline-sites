@@ -393,6 +393,76 @@
       font-family: var(--font-mono);
     }
 
+    /* ── 搜索框 ── */
+    .search-bar-wrap {
+      margin-bottom: 36px;
+    }
+    .search-bar {
+      position: relative;
+      max-width: 520px;
+    }
+    .search-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--fg-faint); font-size: 15px; pointer-events: none;
+      line-height: 1;
+    }
+    .search-input {
+      width: 100%;
+      padding: 11px 40px 11px 40px;
+      font-family: var(--font-body); font-size: 14px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--fg);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-input::placeholder { color: var(--fg-faint); }
+    .search-input:focus {
+      border-color: var(--coral);
+      box-shadow: 0 0 0 3px rgba(224,90,58,0.12);
+    }
+    .search-clear {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--fg-faint); font-size: 16px; line-height: 1;
+      padding: 2px 4px; border-radius: 4px;
+      display: none;
+      transition: color 0.15s;
+    }
+    .search-clear:hover { color: var(--coral); }
+    .search-clear.visible { display: block; }
+    .search-hint {
+      margin-top: 8px;
+      font-size: 11px; color: var(--fg-faint);
+      font-family: var(--font-mono);
+    }
+    /* 无结果提示 */
+    .no-results {
+      display: none;
+      grid-column: 1 / -1;
+      padding: 48px 24px;
+      text-align: center;
+    }
+    .no-results.visible { display: block; }
+    .no-results-icon { font-size: 2rem; margin-bottom: 12px; }
+    .no-results-text { font-size: 14px; color: var(--fg-muted); }
+    .no-results-keyword {
+      font-family: var(--font-mono);
+      color: var(--coral);
+    }
+    /* 搜索高亮 */
+    mark {
+      background: rgba(224,90,58,0.18);
+      color: var(--coral);
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+    /* 隐藏不匹配卡片 */
+    .site-card.hidden, .card-placeholder.hidden {
+      display: none;
+    }
+
     /* ── 入场动画 ── */
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(24px); }
@@ -487,7 +557,25 @@
           <span class="section-title-accent"></span>
         </h2>
       </div>
-      <span class="section-count">共 1 个网站</span>
+      <span class="section-count" id="result-count">共 1 个网站</span>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="search-bar-wrap">
+      <div class="search-bar">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          id="search-input"
+          class="search-input"
+          placeholder="搜索网站标题、描述或标签…"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="搜索网站"
+        />
+        <button class="search-clear" id="search-clear" aria-label="清除搜索" title="清除">✕</button>
+      </div>
+      <p class="search-hint" id="search-hint">支持按标题、描述、标签搜索</p>
     </div>
 
     <div class="cards-grid">
@@ -534,8 +622,14 @@
         </div>
       </a>
 
+      <!-- 无结果提示 -->
+      <div class="no-results" id="no-results" role="status">
+        <div class="no-results-icon">🔍</div>
+        <p class="no-results-text">没有找到与 <span class="no-results-keyword" id="no-results-keyword"></span> 相关的网站</p>
+      </div>
+
       <!-- 占位卡片：更多即将收录 -->
-      <div class="card-placeholder">
+      <div class="card-placeholder" data-search-ignore="true">
         <div class="card-placeholder-icon">＋</div>
         <p class="card-placeholder-text">
           更多网站<br>即将收录
@@ -613,7 +707,7 @@
   </footer>
 
   <script>
-    // 滚动入场动画
+    // ── 滚动入场动画 ──
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -623,14 +717,145 @@
       });
     }, { threshold: 0.1 });
 
-    // 立即触发 hero 动画
     document.querySelectorAll('.hero .anim').forEach(el => {
       setTimeout(() => el.classList.add('visible'), 100);
     });
-
-    // 其他区域滚动触发
     document.querySelectorAll('.grid-section .anim, .about-section .anim').forEach(el => {
       observer.observe(el);
+    });
+
+    // ── 搜索功能 ──
+    // 从 DOM 提取每张卡片的可搜索文本
+    const allCards = Array.from(document.querySelectorAll('.site-card'));
+    const placeholder = document.querySelector('.card-placeholder');
+    const noResults = document.getElementById('no-results');
+    const resultCount = document.getElementById('result-count');
+    const searchInput = document.getElementById('search-input');
+    const searchClear = document.getElementById('search-clear');
+    const searchHint = document.getElementById('search-hint');
+    const noResultsKw = document.getElementById('no-results-keyword');
+
+    // 为每张卡片缓存可搜索文本（标题 + 描述 + 标签）
+    const cardData = allCards.map(card => ({
+      el: card,
+      text: card.textContent.toLowerCase()
+    }));
+
+    const totalCount = allCards.length;
+
+    function escapeRegex(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function highlightText(node, regex) {
+      // 只高亮文本节点，跳过 script/style
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent;
+        if (regex.test(text)) {
+          const frag = document.createDocumentFragment();
+          let lastIdx = 0;
+          let match;
+          regex.lastIndex = 0;
+          while ((match = regex.exec(text)) !== null) {
+            frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            frag.appendChild(mark);
+            lastIdx = match.index + match[0].length;
+          }
+          frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+          node.parentNode.replaceChild(frag, node);
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE &&
+                 !['SCRIPT','STYLE','MARK'].includes(node.tagName)) {
+        Array.from(node.childNodes).forEach(child => highlightText(child, regex));
+      }
+    }
+
+    function clearHighlights(card) {
+      card.querySelectorAll('mark').forEach(mark => {
+        const parent = mark.parentNode;
+        parent.replaceChild(document.createTextNode(mark.textContent), mark);
+        parent.normalize();
+      });
+    }
+
+    function doSearch(query) {
+      const q = query.trim().toLowerCase();
+
+      // 清除按钮显示
+      searchClear.classList.toggle('visible', q.length > 0);
+
+      if (!q) {
+        // 空查询：显示全部
+        cardData.forEach(({ el }) => {
+          el.classList.remove('hidden');
+          clearHighlights(el);
+        });
+        if (placeholder) placeholder.classList.remove('hidden');
+        noResults.classList.remove('visible');
+        resultCount.textContent = `共 ${totalCount} 个网站`;
+        searchHint.textContent = '支持按标题、描述、标签搜索';
+        return;
+      }
+
+      const regex = new RegExp(escapeRegex(q), 'gi');
+      let matched = 0;
+
+      cardData.forEach(({ el, text }) => {
+        clearHighlights(el);
+        if (text.includes(q)) {
+          el.classList.remove('hidden');
+          // 高亮匹配文字
+          const bodyEl = el.querySelector('.card-body');
+          if (bodyEl) highlightText(bodyEl, new RegExp(escapeRegex(q), 'gi'));
+          matched++;
+        } else {
+          el.classList.add('hidden');
+        }
+      });
+
+      // 占位卡片在搜索时隐藏
+      if (placeholder) placeholder.classList.add('hidden');
+
+      if (matched === 0) {
+        noResults.classList.add('visible');
+        noResultsKw.textContent = `"${query.trim()}"`;
+        resultCount.textContent = '无匹配结果';
+        searchHint.textContent = '尝试其他关键词';
+      } else {
+        noResults.classList.remove('visible');
+        resultCount.textContent = `找到 ${matched} 个网站`;
+        searchHint.textContent = `匹配关键词：${query.trim()}`;
+      }
+    }
+
+    // 实时搜索（防抖 120ms）
+    let debounceTimer;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => doSearch(searchInput.value), 120);
+    });
+
+    // 清除按钮
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchInput.focus();
+      doSearch('');
+    });
+
+    // 键盘快捷键：/ 聚焦搜索框
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      if (e.key === 'Escape' && document.activeElement === searchInput) {
+        searchInput.blur();
+        searchInput.value = '';
+        doSearch('');
+      }
     });
   </script>
 
