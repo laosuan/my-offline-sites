@@ -199,14 +199,29 @@
       font-family: var(--font-serif);
       font-size: 18px;
       line-height: 1.85;
-      /* 提高对比度：从 0.88 提升到纯白，确保在深色背景上清晰可读 */
       color: #ffffff;
       letter-spacing: 0.01em;
     }
     .core-insight-text strong {
       color: #ffffff;
       font-weight: 700;
-      /* 用珊瑚色下划线替代颜色区分，避免与背景混淆 */
+      border-bottom: 1.5px solid rgba(224,90,58,0.7);
+      padding-bottom: 1px;
+    }
+    /* 强制覆盖 .article-wrap p 对核心观点卡片内段落的影响 */
+    .article-wrap .core-insight p,
+    .article-wrap .core-insight .core-insight-text {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      line-height: 1.85;
+      color: #ffffff !important;
+      margin-bottom: 0;
+      letter-spacing: 0.01em;
+    }
+    .article-wrap .core-insight p strong,
+    .article-wrap .core-insight .core-insight-text strong {
+      color: #ffffff !important;
+      font-weight: 700;
       border-bottom: 1.5px solid rgba(224,90,58,0.7);
       padding-bottom: 1px;
     }
