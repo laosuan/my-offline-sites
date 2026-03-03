@@ -7,7 +7,7 @@
   <meta name="description" content="只要你没在真正执行，你的所有动作——复盘、规划、整理笔记、与 AI 聊天——本质上都是为了逃避执行而生的"伪装动作"。这不仅是拖延，更是一种深层的生理机制，而这种无意识的逃避循环，就是所谓的"命运"。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     /* ============================================
      * 文章阅读页 — 设计系统
@@ -33,9 +33,11 @@
       --shadow-sm:    0 2px 8px rgba(26,26,46,0.06);
       --shadow-md:    0 8px 32px rgba(26,26,46,0.10);
       --radius:       12px;
-      --font-serif:   'Noto Serif SC', 'Songti SC', Georgia, serif;
-      --font-sans:    'Noto Sans SC', system-ui, sans-serif;
-      --font-mono:    'DM Mono', 'Courier New', monospace;
+      /* Medium 风格字体栈：英文用 source-serif-pro 回退链，中文优先 Noto Serif SC */
+      --font-serif:   'Noto Serif SC', source-serif-pro, Georgia, Cambria, 'Times New Roman', Times, serif;
+      --font-sans:    'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --font-display: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --font-mono:    'DM Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
       --content-w:    680px;
     }
 
@@ -47,6 +49,8 @@
       color: var(--fg);
       line-height: 1.8;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
     }
 
     /* ── 滚动条 ── */
@@ -193,18 +197,24 @@
     }
     .core-insight-text {
       font-family: var(--font-serif);
-      font-size: 17px;
-      line-height: 1.8;
-      color: rgba(255,255,255,0.88);
+      font-size: 18px;
+      line-height: 1.85;
+      /* 提高对比度：从 0.88 提升到纯白，确保在深色背景上清晰可读 */
+      color: #ffffff;
+      letter-spacing: 0.01em;
     }
     .core-insight-text strong {
-      color: white;
+      color: #ffffff;
+      font-weight: 700;
+      /* 用珊瑚色下划线替代颜色区分，避免与背景混淆 */
+      border-bottom: 1.5px solid rgba(224,90,58,0.7);
+      padding-bottom: 1px;
     }
 
     /* 章节标题 */
     .section-heading {
-      font-family: var(--font-serif);
-      font-size: 1.5rem;
+      font-family: var(--font-display);
+      font-size: 1.6rem;
       font-weight: 700;
       color: var(--fg);
       margin: 56px 0 20px;
@@ -227,16 +237,18 @@
       margin-bottom: 8px;
     }
 
-    /* 正文段落 */
+    /* 正文段落 — Medium 风格：衬线字体、20px、32px 行高 */
     .article-wrap p {
-      font-size: 17px;
-      line-height: 1.95;
-      color: #2a2a3e;
-      margin-bottom: 22px;
+      font-family: var(--font-serif);
+      font-size: 20px;
+      line-height: 1.75;
+      color: #242424;
+      margin-bottom: 28px;
+      letter-spacing: 0.01em;
     }
     .article-wrap p strong {
-      color: var(--fg);
-      font-weight: 600;
+      color: #1a1a2e;
+      font-weight: 700;
     }
 
     /* 引用块 */
@@ -249,11 +261,12 @@
     }
     blockquote p {
       font-family: var(--font-serif);
-      font-size: 18px !important;
+      font-size: 20px !important;
       font-style: italic;
-      color: var(--fg) !important;
+      color: #1a1a2e !important;
       margin-bottom: 12px !important;
-      line-height: 1.7 !important;
+      line-height: 1.75 !important;
+      letter-spacing: 0.01em;
     }
     blockquote cite {
       font-size: 13px;
@@ -421,9 +434,11 @@
       margin-bottom: 20px;
     }
     .conclusion p {
-      color: rgba(255,255,255,0.82) !important;
-      font-size: 17px !important;
-      line-height: 1.9 !important;
+      font-family: var(--font-serif);
+      color: rgba(255,255,255,0.95) !important;
+      font-size: 18px !important;
+      line-height: 1.85 !important;
+      letter-spacing: 0.01em;
     }
     .conclusion p strong {
       color: white !important;
